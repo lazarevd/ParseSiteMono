@@ -21,9 +21,9 @@ public class SenderBase {
     ModelMapper modelMapper;
 
     @Transactional(isolation= Isolation.SERIALIZABLE)
-    public void setProcessing(int id) {
+    public void setProcessing(int id, int status) {
         NewsBlockEntity newsBlockEntity = newsBlockRepo.findById(id).get();
-        newsBlockEntity.setProcessing(1);
+        newsBlockEntity.setProcessing(status);
         newsBlockRepo.save(newsBlockEntity);
     }
 

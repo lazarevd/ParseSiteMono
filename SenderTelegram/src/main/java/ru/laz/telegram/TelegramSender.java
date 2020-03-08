@@ -72,6 +72,7 @@ public class TelegramSender extends SenderBase implements Sender {
 
 
     private void sendToChannel(NewsBlockDTO newsBlockDTO) {
+        setProcessing(newsBlockDTO.getId(), 1);
         String fullUrl = botProtocol + "://" + botUrl + botToken + SEND_METHOD;
         String jsonTelegramDTO = castDtoToTelegramJson(newsBlockDTO);
         BoundRequestBuilder request = client.preparePost(fullUrl)
@@ -85,6 +86,7 @@ public class TelegramSender extends SenderBase implements Sender {
                     log.info("Sent :" + jsonTelegramDTO);
                     setSent(newsBlockDTO.getId());
                 } else {
+                    setProcessing(newsBlockDTO.getId(), 0);
                     log.error("Failed to send :" + ", "
                             + jsonTelegramDTO + ", "
                             + fullUrl + ", "
@@ -106,6 +108,7 @@ public class TelegramSender extends SenderBase implements Sender {
 
             @Override
             public void onThrowable(Throwable throwable) {
+                setProcessing(newsBlockDTO.getId(), 0);
                 log.error("Failed to send " + jsonTelegramDTO + " " + throwable.getMessage());
             }
 
