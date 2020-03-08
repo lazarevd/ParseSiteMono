@@ -85,13 +85,13 @@
             </activation>
             <id>default</id>
             <modules>
+                <module>SenderBase</module>
                 <module>ParserBase</module>
                 <module>ParserFdsarr</module>
                 <module>ParserMosfarr</module>
                 <module>Common</module>
                 <module>SenderTelegram</module>
                 <module>Application</module>
-                <module>SenderBase</module>
             </modules>
         </profile>
         <profile>

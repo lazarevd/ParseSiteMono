@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import ru.laz.common.models.NewsBlockEntity;
 import ru.laz.db.repository.NewsBlockRepo;
 import ru.laz.parser.queue.BaseParser;
-import ru.laz.sender.SenderListener;
+import ru.laz.sender.Sender;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class FdsarrParser extends BaseParser {
     NewsBlockRepo newsBlockRepo;
 
     @Autowired
-    SenderListener telegramSender;
+    Sender telegramSender;
 
     @PostConstruct
     public void initBean() {

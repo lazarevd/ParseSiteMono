@@ -1,29 +1,32 @@
 package ru.laz.telegram;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.base.ParserBase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.asynchttpclient.*;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.laz.common.models.NewsBlockDTO;
-import ru.laz.common.models.NewsBlockSendStatusDTO;
-import ru.laz.sender.SenderListener;
-import ru.laz.senderbase.BaseSender;
+import ru.laz.common.models.NewsBlockEntity;
+import ru.laz.db.repository.NewsBlockRepo;
+import ru.laz.sender.Sender;
+import ru.laz.sender.SenderBase;
+
 
 import javax.annotation.PostConstruct;
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
-public class TelegramSender extends BaseSender implements SenderListener {
+public class TelegramSender extends SenderBase implements Sender {
 
-    private Set<Integer> process = new HashSet<>();
 
     @Value("${telegram.bot.protocol}")
     private String botProtocol;
@@ -54,34 +57,33 @@ public class TelegramSender extends BaseSender implements SenderListener {
     }
 
 
-    public void sendToTelegram(NewsBlockDTO newsBlockDTO) {
+
+    private  String castDtoToTelegramJson(NewsBlockDTO newsBlockDTO) {
         int id = newsBlockDTO.getId();
-        if (!process.contains(id)) {
-            try {
-                sendToChannel(newsBlockDTO);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-            process.add(id);
+        TelegramDTO telegramDTO = new TelegramDTO(botChatId, newsBlockDTO.getUrl() + " " + newsBlockDTO.getTitle());
+        String jsonTelegramDTO = "";
+        try {
+            jsonTelegramDTO = objectMapper.writeValueAsString(telegramDTO);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to convert to JSON ", e);
         }
+        return jsonTelegramDTO;
     }
 
 
-    private void sendToChannel(NewsBlockDTO newsBlockDTO) throws JsonProcessingException {
-        int id = newsBlockDTO.getId();
-        TelegramDTO telegramDTO = new TelegramDTO(botChatId, newsBlockDTO.getUrl() + " " + newsBlockDTO.getTitle());
-        String jsonTelegramDTO = objectMapper.writeValueAsString(telegramDTO);
+    private void sendToChannel(NewsBlockDTO newsBlockDTO) {
         String fullUrl = botProtocol + "://" + botUrl + botToken + SEND_METHOD;
+        String jsonTelegramDTO = castDtoToTelegramJson(newsBlockDTO);
         BoundRequestBuilder request = client.preparePost(fullUrl)
                 .setBody(jsonTelegramDTO)
                 .setHeader("Content-Type", "application/json");
-        log.info("Strart send: " + jsonTelegramDTO);
+        log.info("Start send: " + jsonTelegramDTO);
         request.execute(new AsyncHandler<Object>() {
             @Override
             public State onStatusReceived(HttpResponseStatus response) {
                 if (response.getStatusCode() == 200) {
                     log.info("Sent :" + jsonTelegramDTO);
-                    processSent(id);
+                    setSent(newsBlockDTO.getId());
                 } else {
                     log.error("Failed to send :" + ", "
                             + jsonTelegramDTO + ", "
@@ -89,7 +91,6 @@ public class TelegramSender extends BaseSender implements SenderListener {
                             + response.getStatusCode() + ", "
                             + response.getStatusText());
                 }
-                process.remove(id);
                 return null;
             }
 
@@ -100,31 +101,26 @@ public class TelegramSender extends BaseSender implements SenderListener {
 
             @Override
             public State onBodyPartReceived(HttpResponseBodyPart httpResponseBodyPart) {
-                log.info(httpResponseBodyPart.toString());
                 return null;
             }
 
             @Override
             public void onThrowable(Throwable throwable) {
-                log.error(throwable.getMessage());
-                process.remove(id);
+                log.error("Failed to send " + jsonTelegramDTO + " " + throwable.getMessage());
             }
 
             @Override
             public Object onCompleted() {
-                process.remove(id);
                 return null;
             }
         });
     }
 
+
+
     @Override
-    public void convertAndSend(NewsBlockDTO newsBlockDTO) {
-        try {
-            sendToChannel(newsBlockDTO);
-        } catch (JsonProcessingException e) {
-            log.error("NewsBlock parse json exception", e);
-        }
+    public void send() {
+            findUnsent().forEach(nb -> sendToChannel(nb));
     }
 
 }

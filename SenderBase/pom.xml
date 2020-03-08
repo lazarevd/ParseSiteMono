@@ -10,12 +10,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>SenderBase</artifactId>
-<dependencies>
-    <dependency>
-        <groupId>ru.laz.mono</groupId>
-        <artifactId>Common</artifactId>
-        <version>1.0</version>
-    </dependency>
-</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>ru.laz.mono</groupId>
+            <artifactId>ParserFdsarr</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
 
 </project>

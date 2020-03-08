@@ -11,28 +11,24 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.laz.common.models.NewsBlockDTO;
 import ru.laz.common.models.NewsBlockEntity;
-import ru.laz.common.models.NewsBlockSendStatusDTO;
 import ru.laz.db.repository.NewsBlockRepo;
-import ru.laz.sender.SenderListener;
+import ru.laz.sender.Sender;
 
-import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLException;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public abstract class BaseParser {
     protected Logger log = LoggerFactory.getLogger(getClass());
 
     AsyncHttpClient client;
 
-    protected List<SenderListener> senders = new ArrayList<>();
+    protected List<Sender> senders = new ArrayList<>();
 
     protected String newsUrl = "";
 
@@ -41,6 +37,9 @@ public abstract class BaseParser {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private NewsBlockRepo newsBlockRepo;
 
 
     public void init() {
@@ -64,20 +63,21 @@ public abstract class BaseParser {
         client = Dsl.asyncHttpClient(clientBuilder);
     }
 
-    public void sendToSenders(NewsBlockDTO newsBlockDTO) {
-        for (SenderListener se : senders) {
-            se.convertAndSend(newsBlockDTO);
+    public void sendToSenders() {
+        for (Sender se : senders) {
+            se.send();
         }
     }
 
-    protected List<NewsBlockDTO> convertToDtos(List<NewsBlockEntity> input) {
-        List<NewsBlockDTO> returnList = new ArrayList<>();
-        input.forEach(nb -> returnList.add(modelMapper.map(nb, NewsBlockDTO.class)));
-        return returnList;
+
+
+
+    public void getContentFromHttpAndSend() {
+        getContentFromHttp();
+        sendToSenders();
     }
 
-
-    //schedule it
+    //schedule it in extended class
     public void getContentFromHttp() {
         BoundRequestBuilder request = client.prepareGet(newsUrl);
         request.execute(new AsyncHandler<Object>() {
@@ -119,7 +119,7 @@ public abstract class BaseParser {
                     List<NewsBlockEntity> news = parseHtml(sb.toString());
                     log.debug("Fetched: " + news.size());
                     for (NewsBlockEntity nb : news) {
-                        //newsBlockRepo.insertF(nb);
+                        newsBlockRepo.insertF(nb);
                     }
                 }
                 return null;
