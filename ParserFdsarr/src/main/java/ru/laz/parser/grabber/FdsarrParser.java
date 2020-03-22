@@ -91,6 +91,6 @@ public class FdsarrParser extends BaseParser {
 
     @Scheduled(fixedDelayString = "${news.block.refresh}")
     public void getPageContent() {
-        getContentFromHttp();
+        getContentFromHttpAndSend();
     }
 }

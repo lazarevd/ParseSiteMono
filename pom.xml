@@ -98,7 +98,7 @@
             <id>parser</id>
             <modules>
                 <module>ParserBase</module>
-                <module>ParserFdsarr</module>
+                <!--<module>ParserFdsarr</module>-->
                 <module>ParserMosfarr</module>
                 <module>Common</module>
                 <module>Application</module>
