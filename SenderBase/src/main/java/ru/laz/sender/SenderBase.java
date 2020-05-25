@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.laz.common.models.NewsBlockDTO;
 import ru.laz.common.models.NewsBlockEntity;
 import ru.laz.db.repository.NewsBlockRepo;
-import ru.laz.parser.grabber.FdsarrParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,7 @@ public class SenderBase {
         newsBlockRepo.save(newsBlockEntity);
     }
 
-
+    @Transactional(isolation= Isolation.SERIALIZABLE)
     protected List<NewsBlockDTO> findUnsent() {
         return convertToDtos(newsBlockRepo.findBySentAndProcessing(0, 0));
     }

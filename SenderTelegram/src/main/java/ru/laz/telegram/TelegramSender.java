@@ -4,25 +4,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.codec.http.HttpHeaders;
 import org.asynchttpclient.*;
-import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 import ru.laz.common.models.NewsBlockDTO;
-import ru.laz.common.models.NewsBlockEntity;
-import ru.laz.db.repository.NewsBlockRepo;
 import ru.laz.sender.Sender;
 import ru.laz.sender.SenderBase;
 
-
 import javax.annotation.PostConstruct;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class TelegramSender extends SenderBase implements Sender {

@@ -13,13 +13,10 @@ import java.util.List;
 @Repository
 public interface NewsBlockRepo extends CrudRepository<NewsBlockEntity,Integer>, NewsBlockRepoCustom {
 
-    @Transactional(isolation= Isolation.SERIALIZABLE)
     List<NewsBlockEntity> findBySentAndProcessing(int sent, int processing);
 
-    @Transactional(isolation= Isolation.SERIALIZABLE)
     List<NewsBlockEntity> findBySent(int sent);
 
-    @Transactional(isolation= Isolation.SERIALIZABLE)
     List<NewsBlockEntity> findByProcessing(int proc);
 
     List<NewsBlockEntity> findByIdIn(List<Integer> ids);
