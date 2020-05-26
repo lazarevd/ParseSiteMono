@@ -107,8 +107,8 @@ public abstract class BaseParser {
 
             @Override
             public void onThrowable(Throwable t) {
-                sendToSenders();//send others unsent
                 log.error(t.getMessage());
+                sendToSenders();//send others unsent
             }
 
             @Override
