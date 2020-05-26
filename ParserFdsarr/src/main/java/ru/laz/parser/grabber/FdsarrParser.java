@@ -32,8 +32,6 @@ public class FdsarrParser extends BaseParser {
 
     private final String BASE_URL ="https://fdsarr.ru";
 
-    @Autowired
-    NewsBlockRepo newsBlockRepo;
 
     @Autowired
     Sender telegramSender;

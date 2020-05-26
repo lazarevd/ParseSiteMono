@@ -25,9 +25,6 @@ public class MosfarrParser extends BaseParser {
     private final static Logger log = LoggerFactory.getLogger(MosfarrParser.class);
 
     @Autowired
-    NewsBlockRepo newsBlockRepo;
-
-    @Autowired
     Sender telegramSender;
 
     @PostConstruct
