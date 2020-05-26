@@ -106,4 +106,7 @@
         </profile>
     </profiles>
 
+    <build>
+        <finalName>ParseSiteMono</finalName>
+    </build>
 </project>
