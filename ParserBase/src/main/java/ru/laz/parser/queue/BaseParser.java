@@ -75,7 +75,6 @@ public abstract class BaseParser {
 
     public void getContentFromHttpAndSend() {
         getContentFromHttp();
-        sendToSenders();
     }
 
     //schedule it in extended class
@@ -85,8 +84,7 @@ public abstract class BaseParser {
             int status;
             StringBuilder sb = new StringBuilder();
             @Override
-            public State onStatusReceived(HttpResponseStatus responseStatus)
-                    throws Exception {
+            public State onStatusReceived(HttpResponseStatus responseStatus) {
                 log.debug(responseStatus.toString());
                 status = responseStatus.getStatusCode();
                 if (status == 200) {
@@ -97,14 +95,12 @@ public abstract class BaseParser {
             }
 
             @Override
-            public State onHeadersReceived(HttpHeaders headers)
-                    throws Exception {
+            public State onHeadersReceived(HttpHeaders headers) {
                 return State.CONTINUE;
             }
 
             @Override
-            public State onBodyPartReceived(HttpResponseBodyPart bodyPart)
-                    throws Exception {
+            public State onBodyPartReceived(HttpResponseBodyPart bodyPart) {
                 sb.append(new String( bodyPart.getBodyPartBytes(), StandardCharsets.UTF_8));
                 return State.CONTINUE;
             }
@@ -122,6 +118,7 @@ public abstract class BaseParser {
                     for (NewsBlockEntity nb : news) {
                         newsBlockRepo.insertF(nb);
                     }
+                    sendToSenders();
                 }
                 return null;
             }
