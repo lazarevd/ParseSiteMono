@@ -65,6 +65,7 @@ public class TelegramSender extends SenderBase implements Sender {
 
 
     private void sendToChannel(NewsBlockDTO newsBlockDTO) {
+        log.info("Mark in DB: " + newsBlockDTO.getId());
         setProcessing(newsBlockDTO.getId(), 1);
         String fullUrl = botProtocol + "://" + botUrl + botToken + SEND_METHOD;
         String jsonTelegramDTO = castDtoToTelegramJson(newsBlockDTO);
