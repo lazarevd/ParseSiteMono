@@ -20,6 +20,7 @@ import java.io.File;
 public class TelegramSender extends SenderBase implements Sender {
 
 
+    private static final String NAME = "TelegramSender";
     @Value("${telegram.bot.protocol}")
     private String botProtocol;
     @Value("${telegram.bot.url}")
@@ -70,7 +71,7 @@ public class TelegramSender extends SenderBase implements Sender {
         BoundRequestBuilder request = client.preparePost(fullUrl)
                 .setBody(jsonTelegramDTO)
                 .setHeader("Content-Type", "application/json");
-        log.info("Start send: " + jsonTelegramDTO);
+        log.info("Start send: " + newsBlockDTO.getId());
         request.execute(new AsyncHandler<Object>() {
             @Override
             public State onStatusReceived(HttpResponseStatus response) {
@@ -117,6 +118,8 @@ public class TelegramSender extends SenderBase implements Sender {
     public void send() {
             findUnsent().forEach(nb -> sendToChannel(nb));
     }
+
+    public String getName() {return NAME;}
 
 }
 

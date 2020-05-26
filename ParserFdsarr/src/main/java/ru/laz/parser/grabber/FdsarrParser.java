@@ -26,7 +26,7 @@ public class FdsarrParser extends BaseParser {
     //@Autowired
     //private NewsBlockRepo newsBlockRepo;
 
-    private final static Logger logger = LoggerFactory.getLogger(FdsarrParser.class);
+    private final static Logger log = LoggerFactory.getLogger(FdsarrParser.class);
 
     AsyncHttpClient client;
 
@@ -47,6 +47,7 @@ public class FdsarrParser extends BaseParser {
 
 
     public List<NewsBlockEntity> parseHtml(String html) {
+        log.info("start parse");
         Document doc = Jsoup.parseBodyFragment(html);
         Element body = doc.body();
         Elements elems = body.getElementsByTag("section").first()
@@ -71,20 +72,18 @@ public class FdsarrParser extends BaseParser {
         nbt.setDate(dateTop);
         List<NewsBlockEntity> retList = new ArrayList<>();
         retList.add(nbt);
-        logger.debug("elems " + elems.size());
         for (Element el : elems) {
             Element li = el.getElementsByTag("li").first();
             String url = BASE_URL + li.getElementsByTag("a").first().attr("href");
             String date = li.getElementsByClass("arr-news").first().text();
             String title = li.getElementsByTag("h3").first().text();
-
             NewsBlockEntity nb = new NewsBlockEntity();
             nb.setTitle(title);
             nb.setUrl(url);
             nb.setDate(date);
             retList.add(nb);
         }
-
+        if (retList.size() > 0) {log.info("Fetched " + retList.size() + " FDSARR news");}
         return retList;
     }
 

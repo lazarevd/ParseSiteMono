@@ -65,6 +65,7 @@ public abstract class BaseParser {
 
     public void sendToSenders() {
         for (Sender se : senders) {
+            log.info("Start send by " + se.getName());
             se.send();
         }
     }

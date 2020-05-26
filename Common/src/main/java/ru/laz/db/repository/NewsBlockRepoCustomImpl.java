@@ -11,7 +11,7 @@ import javax.persistence.PersistenceContext;
 
 public class NewsBlockRepoCustomImpl implements NewsBlockRepoCustom {
 
-    private static final Logger logger = LoggerFactory.getLogger(NewsBlockRepoCustomImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(NewsBlockRepoCustomImpl.class);
     @PersistenceContext
     EntityManager em;
     @Override
@@ -20,11 +20,8 @@ public class NewsBlockRepoCustomImpl implements NewsBlockRepoCustom {
         NewsBlockEntity nbl = em.find(NewsBlockEntity.class, nb.getId());
         //em.detach(nbl);
         if (null == nbl) {
-            logger.debug("Not Exist! " + nb.getId());
+            log.info("Saving new newsBlock! " + nb.getId() + " url: "+ nb.getUrl());
             em.persist(nb);
-        } else {
-            logger.debug("Exist " + nb.getId());
         }
-
     }
 }

@@ -1,6 +1,8 @@
 package ru.laz.sender;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,8 @@ public class SenderBase {
     protected NewsBlockRepo newsBlockRepo;
     @Autowired
     ModelMapper modelMapper;
+
+    private final static Logger log = LoggerFactory.getLogger(SenderBase.class);
 
     @Transactional(isolation= Isolation.SERIALIZABLE)
     public void setProcessing(int id, int status) {
@@ -41,7 +45,10 @@ public class SenderBase {
 
     private List<NewsBlockDTO> convertToDtos(List<NewsBlockEntity> input) {
         List<NewsBlockDTO> returnList = new ArrayList<>();
-        input.forEach(nb -> returnList.add(modelMapper.map(nb, NewsBlockDTO.class)));
+        input.forEach(nb -> {
+            log.info("Fetched unsent: " + nb.getId());
+            returnList.add(modelMapper.map(nb, NewsBlockDTO.class));
+        });
         return returnList;
     }
 
